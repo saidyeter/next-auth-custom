@@ -17,7 +17,8 @@ export const authOptions = {
             id: "user_id",
             email: "s@yeter.com",
             image: "https://someurl.com/syeter.png",
-            name: "Said"
+            name: "Said",
+            favouriteFruit: "Grape",
           }
         }
         return null
