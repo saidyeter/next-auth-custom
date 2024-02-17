@@ -1,7 +1,33 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import type { AuthOptions } from "next-auth"
 
-export const authOptions = {
+declare module "next-auth" {
+  interface User {
+    // this is for below Session definition and for the CredentialsProvider.authorize method return type
+    favouriteFruit: string;
+  }
+  interface Session {
+    // with this we will be able to see all fields from user whenever session required
+    user: User
+  }
+}
+
+export const authOptions: AuthOptions = {
+  callbacks: {
+    async session({ session, token }) {
+      if (token) {
+        session.user = { ...session.user, ...token }
+      }
+      return session
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.favouriteFruit = user.favouriteFruit
+      }
+      return token
+    }
+  },
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -30,3 +56,8 @@ export const authOptions = {
 const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
+
+import { getServerSession } from "next-auth"
+export function auth() {
+  return getServerSession(authOptions)
+}
